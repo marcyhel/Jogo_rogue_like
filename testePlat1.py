@@ -5,6 +5,7 @@ import pygame as pg
 import math
 import json
 import time
+import copy
 
 
 
@@ -1272,6 +1273,9 @@ class Play:
 		self.desh=False
 		self.timedesh=0
 		self.gatilhoAttak=False
+		self.rastroDash=0
+		self.dirpassado=0
+		self.posipassdo=0
 
 	def attacar(self):
 		self.idSprite=5
@@ -1312,7 +1316,9 @@ class Play:
 			self.idSprite=6
 			self.desh=True
 			self.timedesh=30
-
+			self.rastroDash=0
+			self.dirpassado=self.dir
+			self.posipassdo=copy.deepcopy(self.posi)
 	def jump(self):
 		self.posi[1]-=0.01
 		self.velocidade[1]= -10
@@ -1453,6 +1459,10 @@ class Play:
 		
 		
 		# -------dash --------
+		if(self.contSprite<2):
+			self.rastroDash+=7
+		else:
+			self.rastroDash-=7
 		if((self.desh and self.contSprite<3) or (self.desh and self.attack==1)):
 			if(self.dir==0):
 				self.mover([10,0])
@@ -1519,10 +1529,11 @@ class Play:
 		try:
 			
 			if(self.dir==0):
-				screen.blit(spriteList[cont], (self.rectSprite.left+condicao[0][0]-cam.camera[0],self.rectSprite.top+condicao[0][1]-cam.camera[1]))
+				screen.blit(spriteList[cont]  , (self.rectSprite.left+condicao[0][0]-cam.camera[0],self.rectSprite.top+condicao[0][1]-cam.camera[1]))
 			if(self.dir==1):
-				aux=pygame.transform.flip(spriteList[cont], True, False)
+				aux=pygame.transform.flip(spriteList[cont]  , True, False)
 				screen.blit(aux, (self.rectSprite.left-10+condicao[1][0]-cam.camera[0],self.rectSprite.top+condicao[1][1]-cam.camera[1]))
+
 		except:
 			
 			self.contSprite=0
@@ -1539,6 +1550,11 @@ class Play:
 		#	i.render(screen,cam)
 		#pygame.draw.rect(screen,(100,50,50), pygame.Rect(self.rectSprite.left-cam.camera[0],self.rectSprite.top-cam.camera[1],self.rectSprite.width, self.rectSprite.height))
 		#pygame.draw.rect(screen,(150,50,50), pygame.Rect(self.posi[0]-cam.camera[0], self.posi[1]-cam.camera[1], self.larg, self.alt))
+		if(self.desh and self.dir==self.dirpassado and self.posi != self.posipassdo):
+			self.renderiza(self.spritesDash,self.contSprite,condicao=[[-self.rastroDash,0],[self.rastroDash,0]])
+			self.renderiza(self.spritesDash,self.contSprite,condicao=[[-self.rastroDash/1.5,0],[self.rastroDash/1.5,0]])
+			self.renderiza(self.spritesDash,self.contSprite,condicao=[[-self.rastroDash/2,0],[self.rastroDash/2,0]])
+			self.renderiza(self.spritesDash,self.contSprite,condicao=[[-self.rastroDash/4,0],[self.rastroDash/4,0]])
 		if(self.idSprite==0):
 			self.renderiza(self.spritesIdle,self.contSprite)
 		elif(self.idSprite==1):
@@ -1553,6 +1569,7 @@ class Play:
 			self.renderiza(self.spritesAttack,self.contSprite)
 		elif(self.idSprite==6):
 			self.renderiza(self.spritesDash,self.contSprite)
+
 
 
 img = pygame.image.load('images/grass.png')
